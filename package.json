@@ -9,7 +9,7 @@
     "start:json": "json-server --watch db.json"
   },
   "keywords": [],
-  "author": "",
+  "author": "Andranik Markaryan",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.2",
