@@ -6,7 +6,7 @@ exports.createEmail = (req, res) => {
   const { address } = req.body;
 
   if (!validateEmail(address)) {
-    res.status(500).json({ error: 'Email is incorrect' });
+    return res.status(500).json({ error: 'Email is incorrect' });
   }
 
   fetch('http://localhost:3000/emails', {
