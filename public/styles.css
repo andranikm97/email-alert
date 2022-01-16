@@ -46,7 +46,7 @@ body {
   font-size: 30px;
 }
 
-.modal {
+.email-modal {
   position: absolute;
   top: 0;
   left: 0;
@@ -113,7 +113,7 @@ body {
   padding: 5px 0;
   position: absolute;
   z-index: 1;
-  top: -8px;
+  top: 40px;
   left: 105%;
 
   opacity: 0;
