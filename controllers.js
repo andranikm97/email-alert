@@ -2,6 +2,10 @@ const fetch = (...args) =>
   import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const validateEmail = require('./validateEmail');
 
+exports.getRandomNumber = (req, res) => {
+  res.json({ randomNumber: Math.floor(Math.random() * 100 + 1) });
+};
+
 exports.createEmail = (req, res) => {
   const { address } = req.body;
 
@@ -20,10 +24,6 @@ exports.createEmail = (req, res) => {
   })
     .then((data) => data.json())
     .then((json) => res.json({ creation: json }));
-};
-
-exports.getRandomNumber = (req, res) => {
-  res.json({ randomNumber: Math.floor(Math.random() * 100 + 1) });
 };
 
 exports.deleteAllEmails = async (req, res) => {
