@@ -1,8 +1,14 @@
 const fetch = (...args) =>
   import('node-fetch').then(({ default: fetch }) => fetch(...args));
+const validateEmail = require('./validateEmail');
 
 exports.createEmail = (req, res) => {
   const { address } = req.body;
+
+  if (!validateEmail(address)) {
+    res.status(500).json({ error: 'Email is incorrect' });
+  }
+
   fetch('http://localhost:3000/emails', {
     method: 'POST',
     headers: {
