@@ -1,27 +1,67 @@
+const DID_SUBSCRIBE = 'DID_SUBSCRIBE';
+const modalSkeleton = `
+      <form class="modal-box" id="email-form">
+        <img
+          class="close-button"
+          id="close-modal"
+          src="/images/cross.png"
+          alt="close button"
+        />
+        <div class="form-result">
+          <div class="input-box" id="input-box">
+            <h1 style="margin: 5px">Subscribe!</h1>
+            <input
+              placeholder="Please enter your email"
+              style="margin: 5px"
+              id="entered-email"
+            />
+            <span class="invalid-email-tooltip" id="tooltip">
+              Please enter a valid email
+            </span>
+            <button type="submit" style="margin: 5px">Submit</button>
+          </div>
+          <div class="email-submitted-box" id="email-submitted-box">
+            <h1>Submission successful!</h1>
+            <img
+              class="checkmark"
+              src="/images/checkmark.png"
+              alt="checkmark"
+            />
+          </div>
+        </div>
+      </form>
+  `;
+let modal = document.createElement('div');
+modal.classList.add('email-modal');
+modal.id = 'email-modal';
+modal.innerHTML = modalSkeleton;
+document.body.appendChild(modal);
+
 let randomNumberText = document.getElementById('ran');
 let randomNumberBox = document.getElementById('random-number-box');
-let modal = document.getElementById('email-modal');
-let closeModalButton = document.getElementById('close-modal');
+let closeEmailAlertModalButton = document.getElementById('close-modal');
 let emailForm = document.getElementById('email-form');
 let enteredEmail = document.getElementById('entered-email');
 let tooltip = document.getElementById('tooltip');
 let inputBox = document.getElementById('input-box');
 let emailSubmittedBox = document.getElementById('email-submitted-box');
 
-closeModalButton.addEventListener('click', closeModal);
+closeEmailAlertModalButton.addEventListener('click', closeEmailAlertModal);
 
 function generateRandomNumbers() {
-  const interval = setInterval(function () {
+  const interval = setInterval(() => {
     fetch('http://localhost:4000/random-number')
       .then((data) => data.json())
       .then(({ randomNumber }) => {
         randomNumberText.innerText = `Random number from server: ${randomNumber}`;
-        if (randomNumber > 50 && !localStorage.getItem('DID_SUBCRIBE')) {
+        if (randomNumber > 50) {
           showEmailModal();
           clearInterval(interval);
         }
       });
   }, 1000);
+
+  return interval;
 }
 
 function showEmailModal() {
@@ -31,52 +71,49 @@ function showEmailModal() {
 emailForm.onsubmit = function submitEmail(e) {
   e.preventDefault();
 
-  if (!validateEmail(enteredEmail.value)) {
-    tooltip.style.visibility = 'visible';
-    tooltip.style.opacity = '1';
-
-    setTimeout(() => {
-      tooltip.style.opacity = '0';
-      tooltip.style.visibility = 'none';
-    }, 1000);
-  } else {
-    fetch('http://localhost:4000/emails', {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        address: enteredEmail.value,
-      }),
-    })
-      .then(() => {
+  fetch('http://localhost:4000/emails', {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      address: enteredEmail.value,
+    }),
+  })
+    .then((res) => {
+      console.log(res.status);
+      if (res.status >= 400) {
+        invalidEmail();
+      } else {
         inputBox.style.display = 'none';
-        closeModalButton.style.display = 'none';
+        closeEmailAlertModalButton.style.display = 'none';
         emailSubmittedBox.style.display = 'flex';
         removeRandomNumber();
         setTimeout(() => {
-          closeModal();
-          localStorage.setItem('DID_SUBCRIBE', true);
+          localStorage.setItem(DID_SUBSCRIBE, true);
+          closeEmailAlertModal();
         }, 2000);
-      })
-      .catch((e) => console.error(e));
-  }
+      }
+    })
+    .catch((e) => console.error('Error: ', e));
 };
 
 //* Function grabbed from Stack Overflow (https://stackoverflow.com/questions/46155/whats-the-best-way-to-validate-an-email-address-in-javascript)
 
-function validateEmail(email) {
-  return String(email)
-    .toLowerCase()
-    .match(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-    );
+function invalidEmail() {
+  tooltip.style.visibility = 'visible';
+  tooltip.style.opacity = '1';
+
+  setTimeout(() => {
+    tooltip.style.opacity = '0';
+    tooltip.style.visibility = 'none';
+  }, 1000);
 }
 
-function closeModal() {
+function closeEmailAlertModal() {
   modal.style.display = 'none';
 
-  if (!localStorage.getItem('DID_SUBCRIBE')) {
+  if (!didSubscribe()) {
     generateRandomNumbers();
   }
 }
@@ -85,7 +122,11 @@ function removeRandomNumber() {
   randomNumberBox.style.display = 'none';
 }
 
-if (!localStorage.getItem('DID_SUBCRIBE')) {
+function didSubscribe() {
+  return localStorage.getItem(DID_SUBSCRIBE);
+}
+
+if (!didSubscribe()) {
   generateRandomNumbers();
 } else {
   removeRandomNumber();
