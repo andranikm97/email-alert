@@ -1,8 +1,11 @@
-const { exec } = require('child_process');
+const jsonServer = require('json-server');
+const server = jsonServer.create();
+const router = jsonServer.router('db.json');
 
-exec('npm run start:json', (err) => {
-  if (err) {
-    console.log(err);
-    return err;
-  }
-});
+server.use(router);
+
+const startJSONServer = () => {
+  server.listen(3000);
+};
+
+module.exports = startJSONServer;
