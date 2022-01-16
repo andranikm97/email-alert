@@ -81,24 +81,14 @@ emailForm.onsubmit = function submitEmail(e) {
     }),
   })
     .then((res) => {
-      console.log(res.status);
       if (res.status >= 400) {
         invalidEmail();
       } else {
-        inputBox.style.display = 'none';
-        closeEmailAlertModalButton.style.display = 'none';
-        emailSubmittedBox.style.display = 'flex';
-        removeRandomNumber();
-        setTimeout(() => {
-          localStorage.setItem(DID_SUBSCRIBE, true);
-          closeEmailAlertModal();
-        }, 2000);
+        validEmail();
       }
     })
     .catch((e) => console.error('Error: ', e));
 };
-
-//* Function grabbed from Stack Overflow (https://stackoverflow.com/questions/46155/whats-the-best-way-to-validate-an-email-address-in-javascript)
 
 function invalidEmail() {
   tooltip.style.visibility = 'visible';
@@ -108,6 +98,17 @@ function invalidEmail() {
     tooltip.style.opacity = '0';
     tooltip.style.visibility = 'none';
   }, 1000);
+}
+
+function validEmail() {
+  inputBox.style.display = 'none';
+  closeEmailAlertModalButton.style.display = 'none';
+  emailSubmittedBox.style.display = 'flex';
+  removeRandomNumber();
+  setTimeout(() => {
+    localStorage.setItem(DID_SUBSCRIBE, true);
+    closeEmailAlertModal();
+  }, 2000);
 }
 
 function closeEmailAlertModal() {
